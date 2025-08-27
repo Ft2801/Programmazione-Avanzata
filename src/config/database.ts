@@ -21,6 +21,19 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   logging: false, // Disabilita il logging delle query SQL in console (impostare su console.log per debug)
 });
 
+// Inizializza i modelli Sequelize (import dinamico per evitare problemi di import circolare)
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const models = require('../models');
+  if (models && typeof models.initModels === 'function') {
+    models.initModels(sequelize);
+  }
+} catch (err) {
+  // non blocchiamo l'avvio se l'import fallisce in ambienti di build statici
+  // loggare per debug
+  // console.warn('Could not initialize models:', err);
+}
+
 /**
  * Funzione per verificare la connessione al database.
  * @returns {Promise<void>}

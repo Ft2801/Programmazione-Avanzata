@@ -1,14 +1,17 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+// runtime require for sequelize types to avoid editor type resolution issues
+const SequelizePkg: any = require('sequelize');
+const Model: any = SequelizePkg.Model;
+const DataTypes: any = SequelizePkg.DataTypes;
 import { User } from './user.model';
 
-export class ConsumerProfile extends Model {
+export class ConsumerProfile extends (Model as any) {
   public id!: number;
   public userId!: number;
   public creditBalance!: number;
 }
 
-export const initConsumerProfileModel = (sequelize: Sequelize): void => {
-  ConsumerProfile.init(
+export const initConsumerProfileModel = (sequelize: any): void => {
+  (ConsumerProfile as any).init(
     {
       // ... attributi ...
     },
@@ -20,7 +23,7 @@ export const initConsumerProfileModel = (sequelize: Sequelize): void => {
 };
 
 export const associateConsumerProfileModel = (): void => {
-  ConsumerProfile.belongsTo(User, {
+  (ConsumerProfile as any).belongsTo(User, {
     foreignKey: 'userId',
     as: 'user',
   });

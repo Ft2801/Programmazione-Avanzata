@@ -2,6 +2,9 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { AppError } from './utils/AppError';
 import { errorHandler } from './middlewares/errorHandler.middleware';
+import authRouter from './routes/auth.routes';
+import producerRouter from './routes/producer.routes';
+import bookingRouter from './routes/booking.routes';
 
 // Carica le variabili d'ambiente
 dotenv.config();
@@ -18,14 +21,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- ROTTE ---
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/producers', producerRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // Rotta di test per verificare che il server sia online
+
+/*
 app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
     status: 'success',
     message: 'Welcome to the Energy Marketplace API!',
   });
 });
+*/
 
 // Esempio di come verranno aggiunte le rotte future
 // import authRoutes from './routes/auth.routes';

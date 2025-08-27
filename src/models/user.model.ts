@@ -1,9 +1,12 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+// Use runtime require to avoid editor/type-resolution issues with sequelize typings
+const SequelizePkg: any = require('sequelize');
+const Model: any = SequelizePkg.Model;
+const DataTypes: any = SequelizePkg.DataTypes;
 import bcrypt from 'bcryptjs';
 import { ProducerProfile } from './producerProfile.model';
 import { ConsumerProfile } from './consumerProfile.model';
 
-export class User extends Model {
+export class User extends (Model as any) {
   public id!: number;
   public email!: string;
   public password!: string;
@@ -19,8 +22,8 @@ export class User extends Model {
   }
 }
 
-export const initUserModel = (sequelize: Sequelize): void => {
-  User.init(
+export const initUserModel = (sequelize: any): void => {
+  (User as any).init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -49,8 +52,8 @@ export const initUserModel = (sequelize: Sequelize): void => {
       tableName: 'Users',
       hooks: {
         // Hook per fare l'hash della password prima di creare o aggiornare l'utente
-        beforeSave: async (user: User) => {
-          if (user.changed('password')) {
+        beforeSave: async (user: any, options: any) => {
+          if (user.changed && user.changed('password')) {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(user.password, salt);
           }
@@ -62,11 +65,11 @@ export const initUserModel = (sequelize: Sequelize): void => {
 
 // Funzione per definire le associazioni
 export const associateUserModel = (): void => {
-  User.hasOne(ProducerProfile, {
+  (User as any).hasOne(ProducerProfile, {
     foreignKey: 'userId',
     as: 'producerProfile',
   });
-  User.hasOne(ConsumerProfile, {
+  (User as any).hasOne(ConsumerProfile, {
     foreignKey: 'userId',
 as: 'consumerProfile',
   });
