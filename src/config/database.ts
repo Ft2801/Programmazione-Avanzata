@@ -24,14 +24,19 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
 // Inizializza i modelli Sequelize (import dinamico per evitare problemi di import circolare)
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
+  console.log('Debug: about to require ../models');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const models = require('../models');
+  console.log('Debug: ../models required, keys:', Object.keys(models || {}));
   if (models && typeof models.initModels === 'function') {
+    console.log('Debug: calling models.initModels');
     models.initModels(sequelize);
+    console.log('Debug: models.initModels completed');
   }
 } catch (err) {
   // non blocchiamo l'avvio se l'import fallisce in ambienti di build statici
   // loggare per debug
-  // console.warn('Could not initialize models:', err);
+  console.warn('Could not initialize models:', err);
 }
 
 /**
@@ -42,6 +47,12 @@ export const connectDB = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
     console.log('✅ Database connection has been established successfully.');
+    // In development/testing you can set DB_SYNC=true to auto-create tables using sequelize.sync()
+    if (process.env.DB_SYNC === 'true') {
+      console.log('⚠️  DB_SYNC=true detected — running sequelize.sync({ alter: true }) to sync models (not for production)');
+      await sequelize.sync({ alter: true });
+      console.log('✅ sequelize.sync completed');
+    }
   } catch (error) {
     console.error('❌ Unable to connect to the database:', error);
     process.exit(1); // Esce dal processo se la connessione fallisce

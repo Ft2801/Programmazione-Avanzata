@@ -206,7 +206,8 @@ export const updateBooking = async (userId: number, bookingId: number, data: Upd
   } catch (error: any) {
     await transaction.rollback();
     if (error instanceof AppError) throw error;
-    console.error(error);
+    console.error('updateBooking error:', error);
+    if (error && error.stack) console.error(error.stack);
     throw new AppError('Failed to update booking.', 500);
   }
 };

@@ -21,9 +21,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- ROTTE ---
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/producers', producerRouter);
-app.use('/api/v1/bookings', bookingRouter);
+try {
+  console.log('Registering route prefix /api/v1/auth');
+  app.use('/api/v1/auth', authRouter);
+} catch (e) {
+  console.error('Error mounting authRouter', e);
+}
+try {
+  console.log('Registering route prefix /api/v1/producers');
+  app.use('/api/v1/producers', producerRouter);
+} catch (e) {
+  console.error('Error mounting producerRouter', e);
+}
+try {
+  console.log('Registering route prefix /api/v1/bookings');
+  app.use('/api/v1/bookings', bookingRouter);
+} catch (e) {
+  console.error('Error mounting bookingRouter', e);
+}
 
 // Rotta di test per verificare che il server sia online
 
@@ -44,7 +59,8 @@ app.get('/', (req: Request, res: Response) => {
 // --- GESTIONE ROTTE NON TROVATE ---
 
 // Middleware per gestire le richieste a endpoint non definiti
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
+// Use app.use without a path so Express does not pass a raw '*' pattern to path-to-regexp
+app.use((req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
